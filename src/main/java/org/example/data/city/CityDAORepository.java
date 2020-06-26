@@ -7,12 +7,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class CityDAORepository implements CityDAO {
 
     private static final String FIND_BY_ID = "SELECT * from city WHERE id = ?";
+    private static final String FIND_BY_CODE = "SELECT * FROM city WHERE CountryCode = ?";
 
     @Override
     public Optional<City> findById(int id) {
@@ -51,7 +53,26 @@ public class CityDAORepository implements CityDAO {
 
     @Override
     public List<City> findByCode(String code) {
-        return null;
+        List<City> result = new ArrayList<>();
+
+        try(Connection connection = MyDataSource.getConnection();
+        PreparedStatement statement = createFindByCodeStatement(connection, FIND_BY_CODE, code);
+        ResultSet resultSet = statement.executeQuery()){
+
+            while(resultSet.next()){
+                result.add(createCityFromResultSet(resultSet));
+            }
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    private PreparedStatement createFindByCodeStatement(Connection connection, String findByCode, String code) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(findByCode);
+        statement.setString(1, code.toUpperCase());
+        return statement;
     }
 
     @Override

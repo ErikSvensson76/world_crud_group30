@@ -9,7 +9,7 @@ public class App
 
         CityDAO dao = new CityDAORepository();
 
-        System.out.println(dao.findById(600));
+        dao.findByCode("SWE").forEach(System.out::println);
 
 
     }
