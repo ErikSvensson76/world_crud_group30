@@ -3,10 +3,7 @@ package org.example.data.city;
 import org.example.data.MyDataSource;
 import org.example.entity.City;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -113,7 +110,19 @@ public class CityDAORepository implements CityDAO {
 
     @Override
     public List<City> findAll() {
-        return null;
+        List<City> result = new ArrayList<>();
+        try(Connection connection = MyDataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM city");
+            ResultSet resultSet = statement.executeQuery()){
+
+            while(resultSet.next()){
+                result.add(createCityFromResultSet(resultSet));
+            }
+
+        }catch (SQLException exception){
+            exception.printStackTrace();
+        }
+        return result;
     }
 
     @Override

@@ -9,7 +9,7 @@ public class App
 
         CityDAO dao = new CityDAORepository();
 
-        dao.findByName("St").forEach(System.out::println);
+        dao.findAll().forEach(System.out::println);
 
 
     }
