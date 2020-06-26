@@ -91,19 +91,7 @@ public class CityDAORepository implements CityDAO {
         }catch (SQLException ex){
             ex.printStackTrace();
         }finally {
-            try{
-                if(resultSet != null){
-                    resultSet.close();
-                }
-                if(statement != null){
-                    statement.close();
-                }
-                if(connection != null){
-                    connection.close();
-                }
-            }catch (SQLException ex){
-                ex.printStackTrace();
-            }
+            closeResources(connection, statement, resultSet);
         }
         return result;
     }
@@ -156,21 +144,25 @@ public class CityDAORepository implements CityDAO {
         } catch (SQLException exception) {
             exception.printStackTrace();
         }finally {
-            try{
-                if(keySet != null){
-                    keySet.close();
-                }
-                if(statement != null){
-                    statement.close();
-                }
-                if(connection != null){
-                    connection.close();
-                }
-            }catch (SQLException ex){
-                ex.printStackTrace();
-            }
+            closeResources(connection, statement, keySet);
         }
         return persisted == null ? city : persisted;
+    }
+
+    private void closeResources(Connection connection, PreparedStatement statement, ResultSet resultSet) {
+        try{
+            if(resultSet != null){
+                resultSet.close();
+            }
+            if(statement != null){
+                statement.close();
+            }
+            if(connection != null){
+                connection.close();
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
     }
 
 
