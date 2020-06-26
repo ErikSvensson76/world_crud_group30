@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.data.city.CityDAO;
 import org.example.data.city.CityDAORepository;
+import org.example.entity.City;
 
 public class App
 {
@@ -9,7 +10,10 @@ public class App
 
         CityDAO dao = new CityDAORepository();
 
-        dao.findAll().forEach(System.out::println);
+        System.out.println(dao.findById(4080));
+
+
+
 
 
     }
