@@ -15,6 +15,7 @@ public class CityDAORepository implements CityDAO {
 
     private static final String FIND_BY_ID = "SELECT * from city WHERE id = ?";
     private static final String FIND_BY_CODE = "SELECT * FROM city WHERE CountryCode = ?";
+    public static final String FIND_BY_NAME_LIKE = "SELECT * FROM city WHERE name LIKE ?";
 
     @Override
     public Optional<City> findById(int id) {
@@ -77,7 +78,37 @@ public class CityDAORepository implements CityDAO {
 
     @Override
     public List<City> findByName(String name) {
-        return null;
+        List<City> result = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try{
+            connection = MyDataSource.getConnection();
+            statement = connection.prepareStatement(FIND_BY_NAME_LIKE);
+            statement.setString(1, name.concat("%"));
+            resultSet = statement.executeQuery();
+
+            while (resultSet.next()){
+                result.add(createCityFromResultSet(resultSet));
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }finally {
+            try{
+                if(resultSet != null){
+                    resultSet.close();
+                }
+                if(statement != null){
+                    statement.close();
+                }
+                if(connection != null){
+                    connection.close();
+                }
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+        }
+        return result;
     }
 
     @Override
