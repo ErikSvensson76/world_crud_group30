@@ -1,14 +1,52 @@
 package org.example.data.city;
 
+import org.example.data.MyDataSource;
 import org.example.entity.City;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 public class CityDAORepository implements CityDAO {
+
+    private static final String FIND_BY_ID = "SELECT * from city WHERE id = ?";
+
     @Override
     public Optional<City> findById(int id) {
-        return Optional.empty();
+        Optional<City> cityOptional = Optional.empty();
+
+        try(Connection connection = MyDataSource.getConnection();
+            PreparedStatement statement = createFindByIdStatement(connection, FIND_BY_ID, id);
+            ResultSet resultSet = statement.executeQuery()){
+
+            while(resultSet.next()){
+                cityOptional = Optional.of(createCityFromResultSet(resultSet));
+            }
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+
+        return cityOptional;
+    }
+
+    private City createCityFromResultSet(ResultSet resultSet) throws SQLException {
+        return new City(
+                resultSet.getInt("ID"),
+                resultSet.getString("Name"),
+                resultSet.getString("CountryCode"),
+                resultSet.getString("District"),
+                resultSet.getInt("Population")
+        );
+    }
+
+    private PreparedStatement createFindByIdStatement(Connection connection, String findById, int id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(FIND_BY_ID);
+        statement.setInt(1, id);
+        return statement;
     }
 
     @Override
